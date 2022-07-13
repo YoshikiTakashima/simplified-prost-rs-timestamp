@@ -172,3 +172,21 @@ mod kani {
     }
 
 }
+
+#[cfg(test)]
+mod test_kani_output {
+    use super::Timestamp;
+    #[test]
+    fn check_timestamp_roundtrip_via_system_time() {
+        use std::time::SystemTime;
+        let seconds : i64 = -9223372036854775807;
+        let nanos : i32 = 999997508;
+
+        let mut timestamp = Timestamp { seconds, nanos };
+        timestamp.normalize();
+        if let Ok(system_time) = SystemTime::try_from(timestamp.clone()) {
+            assert_eq!(Timestamp::from(system_time), timestamp);
+        }
+    }
+
+}
