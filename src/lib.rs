@@ -158,16 +158,18 @@ impl TryFrom<Timestamp> for std::time::SystemTime {
 #[cfg(kani)]
 mod kani {
     use super::Timestamp;
-    #[kani::proof]
-    fn check_timestamp_roundtrip_via_system_time() {
-        use std::time::SystemTime;
-        let seconds : i64 = kani::any();
-        let nanos : i32 = kani::any();
+    proptest::proptest!{
+        fn check_timestamp_roundtrip_via_system_time(
+            seconds : i64,
+            nanos : i32,
+        ) {
+            use std::time::SystemTime;
 
-        let mut timestamp = Timestamp { seconds, nanos };
-        timestamp.normalize();
-        if let Ok(system_time) = SystemTime::try_from(timestamp.clone()) {
-            assert_eq!(Timestamp::from(system_time), timestamp);
+            let mut timestamp = Timestamp { seconds, nanos };
+            timestamp.normalize();
+            if let Ok(system_time) = SystemTime::try_from(timestamp.clone()) {
+                assert_eq!(Timestamp::from(system_time), timestamp);
+            }
         }
     }
 
